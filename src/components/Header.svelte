@@ -21,10 +21,10 @@
 		navigate("/",{replace:false});
 		location.reload();
 	}
-
+/*
 	if($store.user.idVendor =="")
 		document.location.href = "/";
-		
+*/
 	Util.refresh.disabled();
 
 	onMount(()=>{
