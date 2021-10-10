@@ -8,27 +8,56 @@
 		ciudad   : '',
 	};
 
-	let isBadUser = false;
-	let isBadPassword = false;
+	$:isEmptyUser = false;
+	$:isEmptyPassword = false;
+	$:isGoodUser = true;
+	$:isGoodPassword = true;
 
 	const regularExpressions = /^[a-zA-Z0-9\s]{1,10}$/;
 
 	function SignIn(username, password, ciudad){
-		console.log("Ya iniciaste sesión :) "+username+" "+password+" "+ciudad);
-		$store.user.name=user.username;
-		$store.user.token=user.password;
+		
+		if(username == ""){
+			isEmptyUser = true;
+		}
+		if(password == ""){
+			isEmptyPassword = true;
+		}
+
+		if(!isEmptyUser && !isEmptyPassword){
+			if(isGoodUser && isGoodPassword){
+				console.log("Ya iniciaste sesión :) "+username+" "+password+" "+ciudad);
+				$store.user.name=user.username;
+				$store.user.token=user.password;
+				$store.address.rpt="000";
+				navigate("/dashboard", { replace: false });
+			}
+		}
 	}
 
+/*
+	function ValidationContent(){
+		if(isGoodUser || isGoodPassword){
+			return false;
+		}
+	};
+*/
+
 	let FilterPassword = () => {
-		
 		if(user.password != ""){
-			isBadPassword = regularExpressions.test(user.password);
+			isGoodPassword = regularExpressions.test(user.password);
+			isEmptyPassword = false;
+		} else {
+			isGoodPassword = true;
 		}
 	}
 
 	let FilterUser = () => {
 		if(user.username != ""){
-			isBadUser = regularExpressions.test(user.username);
+			isGoodUser = regularExpressions.test(user.username);
+			isEmptyUser = false;
+		} else {
+			isGoodUser = true;
 		}
 	}
 
@@ -48,21 +77,28 @@
 					<input type="text" name="user" id="user" bind:value={user.username} on:input={FilterUser}/>
 				</div>
 
-				<div class="alert alert--error m-b-40 {isBadUser ? "hide" : ""}"><p>Usuario no válido</p></div>
-			
+				<div class="alert alert--error m-b-40 {isGoodUser ? "hide" : ""}"><p>Usuario no válido</p></div>
+				{#if isEmptyUser}
+					<div class="alert alert--error m-b-40 "><p>Introduzca un nombre de Usuario por favor</p></div>
+				{/if}
+				
+
 				<div class="ctrl-holder m-b-15">
 					<label for="password" class="placeholder">Contraseña</label>
 					<input type="password" name="password" id="password"  required bind:value={user.password} on:input={
 						FilterPassword}/>
 				</div>
-
 				
-				<div class="alert alert--error m-b-40 {isBadPassword ? "hide" : ""}"><p>Contraseña no válida</p></div>
+				<div class="alert alert--error m-b-40 {isGoodPassword ? "hide" : ""}"><p>Contraseña no válida</p></div>
+
+				{#if isEmptyPassword}
+					<div class="alert alert--error m-b-40 "><p>Introduzca una contraseña por favor</p></div>
+				{/if}
 		
 				<div>
 					<div class="select-holder m-b-20"><svg class="icon" aria-hidden="true"><use xlink:href="/assets/img/icons/symbol-defs.svg#icon-angle-left"></use></svg> 				
 						<select name="ciudades" id="select" bind:value={user.ciudad}>
-							<option value="-1">Canal de ingreso</option>
+							<option value="-1">Seleccione una ciudad</option>
 							<option value="1">CDMX</option>
 							<option value="2">Guadalajara</option>
 							<option value="3">Monterrey</option>
